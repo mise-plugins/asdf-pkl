@@ -68,7 +68,6 @@ download_release() {
 	url="$GH_REPO/releases/download/${version}/pkl-$(get_os)-$(get_arch)"
 
 	echo "* Downloading $TOOL_NAME release $version..."
-	echo $filename
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
