@@ -69,7 +69,7 @@ download_release() {
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	echo $filename
-	curl "${curl_opts[@]}" -o "$filename/pkl" -C - "$url" || fail "Could not download $url"
+	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
 install_version() {
