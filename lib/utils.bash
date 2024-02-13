@@ -53,6 +53,7 @@ get_os() {
 get_arch() {
 	case "$(uname -m)" in
 	aarch64) echo "aarch64" ;;
+	arm64) echo "aarch64" ;;
 	arm) echo "aarch64" ;;
 	x86_64) echo "amd64" ;;
 	*) fail "Unknown architecture: $(uname -m)" ;;
