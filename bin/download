@@ -8,7 +8,7 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 # shellcheck source=./lib/utils.bash
 source "${plugin_dir}/lib/utils.bash"
 
-mkdir -p "$ASDF_DOWNLOAD_PATH"
+mkdir -p "$ASDF_DOWNLOAD_PATH/bin"
 
 release_file="$ASDF_DOWNLOAD_PATH/bin/$TOOL_NAME"
 
