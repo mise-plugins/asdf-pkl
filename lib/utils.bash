@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for pkl.
 GH_REPO="https://github.com/apple/pkl"
 TOOL_NAME="pkl"
 TOOL_TEST="pkl --help"
@@ -14,7 +13,6 @@ fail() {
 
 curl_opts=(-fsSL)
 
-# NOTE: You might want to remove this if pkl is not hosted on GitHub releases.
 if [ -n "${GITHUB_API_TOKEN:-}" ]; then
 	curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
 fi
@@ -27,13 +25,38 @@ sort_versions() {
 list_github_tags() {
 	git ls-remote --tags --refs "$GH_REPO" |
 		grep -o 'refs/tags/.*' | cut -d/ -f3- |
-		sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
+		sed 's/^v//'
 }
 
 list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-	# Change this function if pkl has other means of determining installable versions.
 	list_github_tags
+}
+
+# convert os to macos, linux, or alpine-linux
+get_os() {
+	if test -f /etc/os-release; then
+		case $(. /etc/os-release && echo "$ID") in
+		alpine) echo "alpine-linux" ;;
+		*) echo "linux" ;;
+		esac
+	else
+		local os
+		os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+		case "$os" in
+		darwin) echo "macos" ;;
+		linux) echo "linux" ;;
+		*) fail "Unsupported OS: $os" ;;
+		esac
+	fi
+}
+
+get_arch() {
+	case "$(uname -m)" in
+	aarch64) echo "aarch64" ;;
+	arm) echo "aarch64" ;;
+	x86_64) echo "amd64" ;;
+	*) fail "Unknown architecture: $(uname -m)" ;;
+	esac
 }
 
 download_release() {
@@ -41,8 +64,7 @@ download_release() {
 	version="$1"
 	filename="$2"
 
-	# TODO: Adapt the release URL convention for pkl
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/${version}/pkl-$(get_os)-$(get_arch)"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
